@@ -133,17 +133,6 @@ if(location.protocol==="file:"){m.innerHTML="Файл відкрито напр�
 setTimeout(function(){var b=document.getElementById("boot");if(b&&!b.classList.contains("hide"))m.innerHTML="Не вдалося запустити. Перевірте дані Firebase (firebaseConfig) в index.html та інтернет."},6000)})();
 </script>
 
-<section id="login" class="card hide">
-  <h1>Мої фінанси</h1>
-  <p class="mute">Увійдіть, щоб дані були в хмарі та на всіх пристроях.</p>
-  <input id="em" type="email" placeholder="Email" autocomplete="email">
-  <input id="pw" type="password" placeholder="Пароль (мін. 6 символів)" autocomplete="current-password">
-  <button id="bIn" class="pri">Увійти</button>
-  <button id="bUp" class="ghost">Створити акаунт</button>
-  <button id="bG" class="ghost">Увійти через Google</button>
-  <div id="lerr" class="warn"></div>
-</section>
-
 <main id="app" class="hide">
   <div id="sync" class="sync"><i></i><span id="synct">Підключення…</span></div>
   <div id="t-home" class="tab">
@@ -182,7 +171,6 @@ setTimeout(function(){var b=document.getElementById("boot");if(b&&!b.classList.c
       <p class="mute">Дані й так зберігаються в хмарі автоматично. Файл копії потрібен лише як додаткова страховка.</p>
       <button class="ghost" id="bak" style="width:100%">Зберегти копію (файл)</button>
       <label class="ghost" for="rest">Відновити з файлу</label><input type="file" id="rest" accept=".json,application/json" hidden></div>
-    <div class="card"><div class="mute" id="who"></div><br><button class="ghost" id="out">Вийти</button></div>
   </div>
 </main>
 
@@ -198,15 +186,14 @@ setTimeout(function(){var b=document.getElementById("boot");if(b&&!b.classList.c
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { initializeFirestore, persistentLocalCache, collection, doc, addDoc, deleteDoc, setDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 // ВСТАВТЕ СВОЇ ДАНІ З FIREBASE (Project settings → Your apps → Web app)
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyACDwBHCZ4HYdmhpP3SPYiYU7TFlNYtG14",
+  authDomain: "moi-finansy-7795a.firebaseapp.com",
+  projectId: "moi-finansy-7795a",
+  appId: "1:720901609808:web:9acb45fdef9b2b97adb455"
 };
 
 const CATS = [
@@ -239,24 +226,13 @@ function setSync() {
 addEventListener("online", setSync); addEventListener("offline", setSync);
 let user = null, entries = [], pct = defPct(), cur = ym(today()), unsubs = [];
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 const db = initializeFirestore(app, { localCache: persistentLocalCache() });
 
-// ---------- Вхід ----------
-const lerr = e => $("lerr").textContent = "Помилка: " + (e.code || e.message);
-$("bIn").onclick = () => signInWithEmailAndPassword(auth, $("em").value, $("pw").value).catch(lerr);
-$("bUp").onclick = () => createUserWithEmailAndPassword(auth, $("em").value, $("pw").value).catch(lerr);
-$("bG").onclick = () => signInWithPopup(auth, new GoogleAuthProvider()).catch(lerr);
-$("out").onclick = () => signOut(auth);
-
-onAuthStateChanged(auth, u => {
+// ---------- Старт (без входу: одна спільна база users/shared) ----------
+(u => {
   user = u;
   $("boot").classList.add("hide");
-  unsubs.forEach(f => f()); unsubs = [];
-  $("login").classList.toggle("hide", !!u);
-  for (const id of ["app","nav"]) $(id).classList.toggle("hide", !u);
-  if (!u) return;
-  $("who").textContent = "Ви увійшли як " + (u.email || u.displayName);
+  for (const id of ["app","nav"]) $(id).classList.remove("hide");
   got = false;
   unsubs.push(onSnapshot(query(collection(db,"users",u.uid,"incomes"), orderBy("date","desc")), { includeMetadataChanges: true }, s => {
     pending = !!s.metadata?.hasPendingWrites; setSync();
@@ -284,7 +260,7 @@ onAuthStateChanged(auth, u => {
     tpls = s.docs.map(d => ({ id: d.id, ...d.data() }));
     renderQuick();
   }));
-});
+})({ uid: "shared" });
 
 // ---------- Дії ----------
 $("dt").value = today();

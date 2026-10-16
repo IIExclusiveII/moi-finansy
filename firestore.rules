@@ -1,0 +1,10 @@
+rules_version = '2';
+
+// Без входу: одна спільна база для програми «Мої фінанси»
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/shared/{document=**} {
+      allow read, write: if true;
+    }
+  }
+}
