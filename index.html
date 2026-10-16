@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a1410">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Мої фінанси">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Мої фінанси</title>
+<style>
+:root{--bg:#0a1410;--ink:#eaf5f1;--mute:#8aa59c;--glass:rgba(255,255,255,.06);--glass2:rgba(255,255,255,.12);--line:rgba(255,255,255,.1);--acc:#34d399;--acc2:#22d3ee;--onacc:#06241b;--c1:#34d399;--c2:#fb7185;--c3:#fbbf24;--c4:#818cf8;--c5:#22d3ee;--shadow:0 10px 40px rgba(0,0,0,.35);--safe:env(safe-area-inset-bottom,0px);color-scheme:dark}
+@media(prefers-color-scheme:light){:root{--bg:#eef4f1;--ink:#10231f;--mute:#5a736b;--glass:rgba(255,255,255,.72);--glass2:rgba(255,255,255,.95);--line:rgba(16,35,31,.1);--acc:#0f9d73;--acc2:#0891b2;--onacc:#fff;--c1:#0f9d73;--c2:#e11d48;--c3:#d97706;--c4:#4f46e5;--c5:#0891b2;--shadow:0 10px 30px rgba(16,35,31,.12);color-scheme:light}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg)}
+body{color:var(--ink);font:16px/1.4 -apple-system,"SF Pro Display","Segoe UI",Roboto,sans-serif;padding:env(safe-area-inset-top,0px) 0 calc(110px + var(--safe));overflow-x:hidden}
+h1,h2{margin:0}h2{font-size:18px}
+.bg{position:fixed;inset:0;z-index:-1;background:var(--bg);overflow:hidden}
+.bg span{position:absolute;width:60vmax;height:60vmax;border-radius:50%;filter:blur(80px);opacity:.3;animation:drift 18s ease-in-out infinite alternate}
+.bg span:nth-child(1){background:var(--c1);left:-25vmax;top:-25vmax}
+.bg span:nth-child(2){background:var(--c4);right:-30vmax;bottom:-20vmax;animation-delay:-7s}
+@keyframes drift{to{transform:translate(9vmax,7vmax) scale(1.15)}}
+@keyframes up{from{opacity:0;transform:translateY(18px)}}
+@keyframes pop{from{opacity:0;transform:scale(.9) translateY(12px)}60%{transform:scale(1.02)}}
+@keyframes draw{from{stroke-dasharray:0 100}}
+@keyframes grow{from{transform:scaleY(0)}}
+@keyframes fill{from{transform:scaleX(0)}}
+main{padding:12px 14px;max-width:560px;margin:0 auto}
+.tab{animation:up .4s cubic-bezier(.2,.8,.2,1)}
+.card{background:var(--glass);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border:1px solid var(--line);border-radius:22px;padding:16px;margin:12px 0;box-shadow:var(--shadow);animation:up .5s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0)*60ms)}
+.card.pop{animation:pop .6s cubic-bezier(.2,.9,.3,1.2) both;border-color:var(--acc)}
+button{font:inherit;border:0;color:inherit;cursor:pointer;transition:transform .15s,background .25s}
+button:active{transform:scale(.95)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.pri{width:100%;padding:15px;border-radius:16px;font-weight:700;color:var(--onacc);background:linear-gradient(135deg,var(--acc),var(--acc2))}
+.ghost{background:var(--glass);border:1px solid var(--line);border-radius:14px;padding:12px 16px;color:var(--mute)}
+.ic{width:40px;height:40px;border-radius:50%;background:var(--glass2);font-size:22px;line-height:1}
+input{font:inherit;width:100%;padding:13px 14px;border-radius:14px;border:1px solid var(--line);background:var(--glass);color:var(--ink)}
+.mute{color:var(--mute);font-size:13px}
+.big{font-size:30px;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums;display:block}
+.top,.mnav{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.dw{position:relative;width:200px;margin:8px auto 12px}
+.donut{width:100%;display:block}
+.ctr{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.ctr .big{font-size:24px}
+.row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-top:1px solid var(--line);font-size:15px}
+.row i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:9px}
+.row em{font-style:normal;color:var(--mute);font-size:12px;margin-left:6px}
+.row strong{font-variant-numeric:tabular-nums}
+.row:first-of-type.hl{border-top:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{font-size:13px;padding:6px 11px;border-radius:20px;background:var(--glass2);border:1px solid var(--line)}
+.chip i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}
+.x{background:var(--glass2);color:var(--mute);font-size:22px;width:40px;height:40px;border-radius:50%;line-height:1;padding:0}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.stats div{background:var(--glass2);border-radius:14px;padding:11px}
+.stats b{display:block;font-size:17px;font-variant-numeric:tabular-nums}
+.meter{height:8px;border-radius:6px;background:var(--line);overflow:hidden;margin-top:6px}
+.meter i{display:block;height:100%;border-radius:6px;transform-origin:left;animation:fill 1s cubic-bezier(.2,.8,.2,1) both;transition:width .3s}
+.bar{transform-box:fill-box;transform-origin:bottom;animation:grow .9s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0)*70ms)}
+svg text{fill:var(--mute);font-size:10px}
+.pct{display:grid;grid-template-columns:1fr 90px;gap:8px;align-items:center;margin:12px 0}
+.warn{color:var(--c2);font-weight:600;font-size:14px;min-height:20px}
+nav{position:fixed;left:14px;right:14px;bottom:calc(12px + var(--safe));max-width:532px;margin:0 auto;display:flex;gap:4px;padding:6px;border-radius:24px;background:var(--glass);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);border:1px solid var(--line);box-shadow:var(--shadow);z-index:10}
+nav button{flex:1;display:grid;justify-items:center;gap:2px;padding:9px 4px;border-radius:18px;background:transparent;color:var(--mute);font-size:12px}
+nav button.on{background:var(--glass2);color:var(--acc)}
+nav svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.amtw{position:relative}
+.amtw input{font-size:30px;font-weight:800;text-align:center;padding:16px 40px}
+.amtw span{position:absolute;right:18px;top:50%;transform:translateY(-50%);font-size:24px;color:var(--mute)}
+.quick{border-color:color-mix(in srgb,var(--acc) 45%,var(--line))}
+.quick .pri{margin-top:12px}
+.det{margin-top:8px}.det summary{color:var(--mute);font-size:14px;cursor:pointer;padding:6px 0}.seg{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(max-content,1fr);overflow-x:auto;gap:4px;background:var(--glass);padding:4px;border-radius:16px;border:1px solid var(--line)}
+.seg button{white-space:nowrap;padding:10px 10px;border-radius:12px;background:transparent;color:var(--mute);font-size:13px}
+.seg button.on{background:linear-gradient(135deg,var(--acc),var(--acc2));color:var(--onacc);font-weight:700}
+.scroll{overflow-x:auto;margin:0 -6px;padding-bottom:4px}
+.chip.off{opacity:.4;text-decoration:line-through}
+.sync{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--mute);padding:2px 4px 0}
+.sync i{width:8px;height:8px;border-radius:50%;background:var(--acc)}
+.sync.wait i{background:var(--c3);animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.25}}
+label.ghost{display:block;text-align:center;cursor:pointer;margin-top:8px}
+#rep{position:fixed;inset:0;z-index:50;background:#fff;color:#111;overflow:auto;display:none}
+#rep.show{display:block}
+.rbar{position:sticky;top:0;display:flex;gap:8px;padding:10px 12px;padding-top:calc(10px + env(safe-area-inset-top,0px));background:#eef2f0;border-bottom:1px solid #cfd6d3;z-index:2}
+.rbar button{flex:1}.rbar .ghost{background:#fff;color:#333;border-color:#cfd6d3}
+#rbody{padding:16px;max-width:1000px;margin:0 auto;font-size:13px}
+#rbody h1{font-size:22px;margin-bottom:4px}
+#rbody table{width:100%;border-collapse:collapse;margin:12px 0;font-size:11.5px}
+#rbody th,#rbody td{border:1px solid #c9d1ce;padding:5px 6px;text-align:right;font-variant-numeric:tabular-nums}
+#rbody th:nth-child(-n+2),#rbody td:nth-child(-n+2){text-align:left}
+#rbody th{background:#eef2f0}#rbody tfoot td{font-weight:700;background:#f4f7f5}
+.rscroll{overflow-x:auto}
+@media print{@page{size:A4 landscape;margin:12mm}html,body{background:#fff!important;padding:0!important}body>*:not(#rep){display:none!important}#rep{position:static;display:block!important;overflow:visible}.rbar{display:none}#rbody{padding:0;max-width:none}}
+.editbar{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;padding:8px 10px;border-radius:12px;background:color-mix(in srgb,var(--c3) 18%,transparent);color:var(--c3);font-weight:600;font-size:13px}
+.swipe{position:relative;margin:12px 0}
+.swipe .card{margin:0}
+.swipe-slide{position:relative;touch-action:pan-y;will-change:transform}
+.swipe-slide.snap{transition:transform .22s cubic-bezier(.2,.8,.2,1)}
+.swipe-bg{position:absolute;top:0;bottom:0;right:0;width:0;overflow:hidden;white-space:nowrap;border-radius:22px;background:var(--c2);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:flex-end}
+.swipe-slide.snap+.swipe-bg{transition:width .22s cubic-bezier(.2,.8,.2,1)}
+.chip.st{border-color:var(--acc);color:var(--acc);font-weight:600;margin-top:8px}
+.chip.st.no{border-color:var(--c2);color:var(--c2)}
+.chip.st.part{border-color:var(--c3);color:var(--c3)}
+.svrow{margin-top:10px;display:grid;gap:6px}
+.chip.tpl{border-color:var(--acc);color:var(--acc);font-weight:600}
+.goal{display:grid;grid-template-columns:72px 1fr;gap:12px;align-items:center}
+.gdone{color:var(--acc);font-weight:700}
+.det .two{margin-top:6px}
+.row.hl{font-weight:700;font-size:17px}.row.hl strong{color:var(--acc)}
+#live{margin-top:8px;min-height:40px}#live>.mute{margin-bottom:2px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#live .row{padding:5px 0;font-size:14px}
+#live p{margin:0;text-align:center}
+.hide{display:none!important}
+#login{max-width:420px;margin:40px auto;display:grid;gap:10px;text-align:center}
+.toast .undo{margin-left:12px;background:none;color:inherit;text-decoration:underline;font-weight:700;padding:4px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(100px + var(--safe));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:14px;font-size:14px;z-index:30;animation:up .3s both}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body data-tab="home">
+<div class="bg"><span></span><span></span></div>
+
+<div id="boot" style="padding:60px 20px;text-align:center"><h1>Мої фінанси</h1><p class="mute" id="bootmsg">Завантаження…</p></div>
+<script>
+(function(){var m=document.getElementById("bootmsg");
+if(location.protocol==="file:"){m.innerHTML="Файл відкрито напряму, так програма не працює. Завантажте папку на Netlify та відкрийте посилання з https://…";return}
+setTimeout(function(){var b=document.getElementById("boot");if(b&&!b.classList.contains("hide"))m.innerHTML="Не вдалося запустити. Перевірте дані Firebase (firebaseConfig) в index.html та інтернет."},6000)})();
+</script>
+
+<section id="login" class="card hide">
+  <h1>Мої фінанси</h1>
+  <p class="mute">Увійдіть, щоб дані були в хмарі та на всіх пристроях.</p>
+  <input id="em" type="email" placeholder="Email" autocomplete="email">
+  <input id="pw" type="password" placeholder="Пароль (мін. 6 символів)" autocomplete="current-password">
+  <button id="bIn" class="pri">Увійти</button>
+  <button id="bUp" class="ghost">Створити акаунт</button>
+  <button id="bG" class="ghost">Увійти через Google</button>
+  <div id="lerr" class="warn"></div>
+</section>
+
+<main id="app" class="hide">
+  <div id="sync" class="sync"><i></i><span id="synct">Підключення…</span></div>
+  <div id="t-home" class="tab">
+    <div class="card quick" id="quick">
+      <div id="editbar" class="editbar hide"><span>Редагування запису · відсотки лишаються ті, що були</span><button class="chip" data-cancel>Скасувати</button></div>
+      <div class="amtw"><input id="amt" type="number" inputmode="decimal" enterkeyhint="done" min="0" placeholder="Сума, що надійшла" aria-label="Сума"><span>₴</span></div>
+      <div class="chips" id="qc"></div>
+      <div id="live"></div>
+      <div id="svrow" class="svrow hide"><span class="mute">Скільки з цього вже відклали? Решта розподілиться по інших категоріях</span>
+        <div class="two" style="grid-template-columns:1fr auto auto"><input id="svd" type="number" inputmode="decimal" min="0" placeholder="Усе" aria-label="Скільки відкладено"><button class="chip" data-sv="all">Відклав усе</button><button class="chip" data-sv="zero">Не відклав</button></div></div>
+      <details class="det"><summary>Дата та коментар</summary>
+        <div class="two"><input id="dt" type="date" aria-label="Дата"><input id="note" type="text" placeholder="Коментар" aria-label="Коментар"></div>
+        <div class="chips"><button class="chip" data-d="0">Сьогодні</button><button class="chip" data-d="1">Вчора</button></div>
+      </details>
+      <button id="add" class="pri">Додати надходження</button>
+    </div>
+    <div id="last"></div>
+    <div class="card" id="hero"></div>
+    <div id="list"></div>
+  </div>
+  <div id="t-an" class="tab hide"></div>
+  <div id="t-goals" class="tab hide"></div>
+  <div id="t-cred" class="tab hide"></div>
+  <div id="t-set" class="tab hide">
+    <div class="card">
+      <h2>Відсотки розподілу</h2>
+      <p class="mute">Діють для нових надходжень. Старі записи зберігають відсотки, що були на момент внесення.</p>
+      <div class="pct" id="pcts"></div>
+      <div class="meter"><i id="pm" style="width:100%;background:var(--acc)"></i></div>
+      <p class="warn" id="warn"></p>
+      <button id="savePct" class="pri">Зберегти</button>
+    </div>
+    <div class="card"><h2>Шаблони надходжень</h2><div id="tpls"></div></div>
+    <div class="card"><h2 id="trashh">Кошик</h2><div id="trash"></div></div>
+    <div class="card"><h2>Резервна копія</h2>
+      <p class="mute">Дані й так зберігаються в хмарі автоматично. Файл копії потрібен лише як додаткова страховка.</p>
+      <button class="ghost" id="bak" style="width:100%">Зберегти копію (файл)</button>
+      <label class="ghost" for="rest">Відновити з файлу</label><input type="file" id="rest" accept=".json,application/json" hidden></div>
+    <div class="card"><div class="mute" id="who"></div><br><button class="ghost" id="out">Вийти</button></div>
+  </div>
+</main>
+
+<nav id="nav" class="hide">
+  <button data-tab="home" class="on"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg>Головна</button>
+  <button data-tab="an"><svg viewBox="0 0 24 24"><path d="M5 20V11M12 20V4M19 20v-6"/></svg>Аналітика</button>
+  <button data-tab="goals"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 12l6-6"/></svg>Цілі</button>
+  <button data-tab="cred"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/></svg>Кредити</button>
+  <button data-tab="set"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>Відсотки</button>
+</nav>
+
+<div id="rep"><div class="rbar"><button class="pri" id="rprint">Друк / Зберегти як PDF</button><button class="ghost" id="rclose">Закрити</button></div><div id="rbody"></div></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { initializeFirestore, persistentLocalCache, collection, doc, addDoc, deleteDoc, setDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// ВСТАВТЕ СВОЇ ДАНІ З FIREBASE (Project settings → Your apps → Web app)
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT",
+  appId: "YOUR_APP_ID"
+};
+
+const CATS = [
+  {k:"save",  name:"Відкласти одразу",    color:"var(--c1)", def:15},
+  {k:"must",  name:"Обовʼязкові платежі", color:"var(--c2)", def:55},
+  {k:"spend", name:"Розтрати",            color:"var(--c3)", def:5},
+  {k:"credit",name:"Допуск на кредити",   color:"var(--c4)", def:10},
+  {k:"invest",name:"Інвестування",        color:"var(--c5)", def:15}
+];
+const MN = ["Січень","Лютий","Березень","Квітень","Травень","Червень","Липень","Серпень","Вересень","Жовтень","Листопад","Грудень"];
+const $ = id => document.getElementById(id);
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt = n => Math.round(n).toLocaleString("uk-UA") + " ₴";
+const isoD = d => new Date(d - d.getTimezoneOffset()*6e4).toISOString().slice(0,10);
+const today = () => isoD(new Date());
+const ym = s => s.slice(0,7);
+const mlabel = k => MN[+k.slice(5)-1] + " " + k.slice(0,4);
+const shiftM = (k, n) => { const d = new Date(+k.slice(0,4), +k.slice(5)-1+n, 1); return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0"); };
+const defPct = () => Object.fromEntries(CATS.map(c => [c.k, c.def]));
+const split = (a, p) => Object.fromEntries(CATS.map(c => [c.k, a * (p[c.k]||0) / 100]));
+const rows = (s, p, hl) => CATS.map(c => `<div class="row${hl && c.k==="save" ? " hl" : ""}"><span><i style="background:${c.color}"></i>${c.name}${p ? `<em>${p[c.k]}%</em>` : ""}</span><strong>${fmt(s[c.k])}</strong></div>`).join("");
+
+let got = false, pending = false, goals = [], credits = [], tpls = [], trash = [], gcats = ["save","invest"];
+function setSync() {
+  const off = !navigator.onLine;
+  $("sync").className = "sync" + (pending || off ? " wait" : "");
+  $("synct").textContent = off ? "Немає інтернету: дані збережено на телефоні, синхронізуються пізніше" : pending ? "Збереження…" : "Усе збережено ☁";
+}
+addEventListener("online", setSync); addEventListener("offline", setSync);
+let user = null, entries = [], pct = defPct(), cur = ym(today()), unsubs = [];
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = initializeFirestore(app, { localCache: persistentLocalCache() });
+
+// ---------- Вхід ----------
+const lerr = e => $("lerr").textContent = "Помилка: " + (e.code || e.message);
+$("bIn").onclick = () => signInWithEmailAndPassword(auth, $("em").value, $("pw").value).catch(lerr);
+$("bUp").onclick = () => createUserWithEmailAndPassword(auth, $("em").value, $("pw").value).catch(lerr);
+$("bG").onclick = () => signInWithPopup(auth, new GoogleAuthProvider()).catch(lerr);
+$("out").onclick = () => signOut(auth);
+
+onAuthStateChanged(auth, u => {
+  user = u;
+  $("boot").classList.add("hide");
+  unsubs.forEach(f => f()); unsubs = [];
+  $("login").classList.toggle("hide", !!u);
+  for (const id of ["app","nav"]) $(id).classList.toggle("hide", !u);
+  if (!u) return;
+  $("who").textContent = "Ви увійшли як " + (u.email || u.displayName);
+  got = false;
+  unsubs.push(onSnapshot(query(collection(db,"users",u.uid,"incomes"), orderBy("date","desc")), { includeMetadataChanges: true }, s => {
+    pending = !!s.metadata?.hasPendingWrites; setSync();
+    if (!got || (s.docChanges ? s.docChanges().length : 1)) {
+      got = true;
+      const all = s.docs.map(d => ({ id: d.id, ...d.data() }));
+      entries = all.filter(e => !e.deleted); trash = all.filter(e => e.deleted).sort((a, b) => b.deleted - a.deleted);
+      render();
+    }
+  }));
+  unsubs.push(onSnapshot(doc(db,"users",u.uid,"settings","main"), s => {
+    pct = { ...defPct(), ...(s.data()?.pct || {}) };
+    gcats = s.data()?.goalCats || ["save","invest"];
+    renderPct(); live(); renderGoals();
+  }));
+  unsubs.push(onSnapshot(query(collection(db,"users",u.uid,"goals"), orderBy("ts","asc")), s => {
+    goals = s.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderGoals();
+  }));
+  unsubs.push(onSnapshot(query(collection(db,"users",u.uid,"credits"), orderBy("ts","asc")), s => {
+    credits = s.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderCred();
+  }));
+  unsubs.push(onSnapshot(query(collection(db,"users",u.uid,"templates"), orderBy("ts","asc")), s => {
+    tpls = s.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderQuick();
+  }));
+});
+
+// ---------- Дії ----------
+$("dt").value = today();
+function toast(t) { const d = document.createElement("div"); d.className = "toast"; d.textContent = t; document.body.append(d); setTimeout(() => d.remove(), 2200); }
+function openReport(a, b, label) {
+  const list = entries.filter(e => e.date >= a && e.date <= b).sort((x, y) => x.date.localeCompare(y.date) || (x.ts || 0) - (y.ts || 0));
+  const tot = sums(list), uni = new Set(list.map(e => JSON.stringify(e.pct || pct))).size <= 1, hp = uni ? (list[0]?.pct || pct) : null;
+  const head = CATS.map(c => `<th>${c.name}${hp ? `<br>${hp[c.k]}%` : ""}</th>`).join("");
+  const body = list.map(e => { const s = esplit(e); return `<tr><td>${e.date.split("-").reverse().join(".")}</td><td>${esc(e.note || "")}${e.saved !== undefined && e.saved !== null ? ` <i>(відкладено ${fmt(e.saved)} з ${fmt(planS(e))})</i>` : ""}</td><td>${fmt(e.amount)}</td>${CATS.map(c => `<td>${fmt(s[c.k])}</td>`).join("")}</tr>`; }).join("");
+  $("rbody").innerHTML = `<h1>Звіт про надходження</h1><div><b>${label}</b></div><div style="color:#555">Сформовано: ${new Date().toLocaleDateString("uk-UA")} · записів: ${list.length}${uni ? "" : " · у цьому періоді відсотки змінювались: у кожному записі діяли свої"}${list.some(e => e.saved !== undefined && e.saved !== null) ? " · де відкладено іншу суму, решта категорій перераховані пропорційно" : ""}</div>
+    <div class="rscroll"><table><thead><tr><th>Дата</th><th>Коментар</th><th>Сума</th>${head}</tr></thead><tbody>${body || `<tr><td colspan="8">Немає надходжень</td></tr>`}</tbody><tfoot><tr><td colspan="2">Разом</td><td>${fmt(tot.inc)}</td>${CATS.map(c => `<td>${fmt(tot.t[c.k])}</td>`).join("")}</tr></tfoot></table></div>`;
+  $("rep").classList.add("show");
+}
+$("rprint").onclick = () => window.print();
+$("rclose").onclick = () => $("rep").classList.remove("show");
+$("bak").onclick = () => {
+  const blob = new Blob([JSON.stringify({ v: 1, pct, entries: entries.map(({ id, ...r }) => r), trash: trash.map(({ id, ...r }) => r) }, null, 1)], { type: "application/json" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "budget-backup-" + today() + ".json"; a.click();
+};
+$("rest").onchange = async e => {
+  try {
+    const d = JSON.parse(await e.target.files[0].text()), have = new Set(entries.map(x => x.date + "|" + x.amount + "|" + x.ts)); let n = 0;
+    for (const r of d.entries || []) {
+      if (have.has(r.date + "|" + r.amount + "|" + r.ts)) continue;
+      addDoc(collection(db,"users",user.uid,"incomes"), { amount: +r.amount, date: r.date, note: r.note || "", pct: r.pct || pct, ts: r.ts || Date.now(), ...(r.saved !== undefined && r.saved !== null ? { saved: +r.saved } : {}) }).catch(() => {}); n++;
+    }
+    toast("Відновлено записів: " + n);
+  } catch (err) { toast("Не вдалося прочитати файл"); }
+  e.target.value = "";
+};
+function undoToast(msg, fn) {
+  document.querySelectorAll(".toast").forEach(t => t.remove());
+  const d = document.createElement("div"); d.className = "toast";
+  d.innerHTML = `${esc(msg)} <button class="undo">Скасувати</button>`;
+  d.querySelector("button").onclick = () => { fn(); d.remove(); };
+  document.body.append(d); setTimeout(() => d.remove(), 5000);
+}
+const mdiff = (a, b) => (+b.slice(0,4) - +a.slice(0,4)) * 12 + (+b.slice(5,7) - +a.slice(5,7));
+function poolInfo() {
+  let total = 0; entries.forEach(e => { const sp = esplit(e); gcats.forEach(k => total += sp[k] || 0); });
+  const used = goals.reduce((x, g) => x + (g.log || []).reduce((y, l) => y + l.a, 0), 0);
+  return { total, used, free: total - used };
+}
+function rate() {
+  const start = shiftM(ym(today()), -2) + "-01", list = entries.filter(e => e.date >= start);
+  if (!list.length) return 0;
+  let t = 0; list.forEach(e => { const sp = esplit(e); gcats.forEach(k => t += sp[k] || 0); });
+  return t / new Set(list.map(e => ym(e.date))).size;
+}
+function ring(p, done) {
+  return `<svg viewBox="0 0 44 44" width="72" height="72" role="img" aria-label="${Math.round(p)}%"><circle r="18" cx="22" cy="22" fill="none" stroke-width="6" style="stroke:var(--line)"/><circle r="18" cx="22" cy="22" fill="none" stroke-width="6" pathLength="100" transform="rotate(-90 22 22)" style="stroke:${done ? "var(--c1)" : "var(--acc)"};stroke-linecap:${p > 2 ? "round" : "butt"};stroke-dasharray:${Math.min(p, 100)} 100;animation:draw 1.1s cubic-bezier(.2,.8,.2,1) both"/><text x="22" y="25" text-anchor="middle" style="font-size:9px;font-weight:700;fill:var(--ink)">${Math.round(p)}%</text></svg>`;
+}
+function renderGoals() {
+  const el = $("t-goals"); if (!el) return;
+  const P = poolInfo(), r = rate(), now = ym(today());
+  const cards = goals.map((g, i) => {
+    const log = g.log || [], saved = log.reduce((x, l) => x + l.a, 0), rem = Math.max(0, g.target - saved), p = g.target ? saved / g.target * 100 : 0, done = rem <= 0;
+    let info = "";
+    if (done) info = `<div class="gdone">Ціль досягнуто ✓</div>`;
+    else {
+      if (g.deadline) { const m = mdiff(now, g.deadline); info += m < 0 ? `<div class="warn">Термін минув (${mlabel(g.deadline)})</div>` : `<div>До ${mlabel(g.deadline)}: відкладайте <b>${fmt(rem / Math.max(1, m))}</b> на місяць</div>`; }
+      if (r > 0) { const m = Math.ceil(rem / r); if (m < 600) info += `<div class="mute">Якщо відкладати лише на цю ціль (≈ ${fmt(r)} на місяць): ${m <= 1 ? "цього місяця" : "≈ " + mlabel(shiftM(now, m))}</div>`; }
+    }
+    const fill = Math.floor(Math.min(rem, Math.max(0, P.free)));
+    return `<div class="card" style="--i:${Math.min(i + 2, 8)}">
+      <div class="goal">${ring(p, done)}<div><div class="top"><strong style="font-size:18px">${esc(g.name)}</strong><button class="x" data-gdel="${g.id}" aria-label="Видалити ціль">×</button></div>
+        <div><b>${fmt(saved)}</b> <span class="mute">з ${fmt(g.target)} · залишилось ${fmt(rem)}</span></div></div></div>
+      <div style="margin-top:10px;display:grid;gap:4px;font-size:14px">${info}</div>
+      ${done ? "" : `<div class="two" style="grid-template-columns:1fr auto;margin-top:12px"><input id="gi_${g.id}" type="number" inputmode="decimal" min="0" placeholder="Скільки внести, ₴" aria-label="Сума внеску"><button class="pri" style="width:auto;padding:12px 18px" data-gadd="${g.id}">Додати</button></div>
+      ${fill >= 1 ? `<div class="chips"><button class="chip" data-gfill="${g.id}|${fill}">Підставити ${fmt(fill)}</button></div>` : ""}`}
+      ${log.length ? `<details class="det"><summary>Історія внесків (${log.length})</summary>${log.slice().reverse().map(l => `<div class="row"><span>${l.d.split("-").reverse().join(".")}</span><span><strong>+${fmt(l.a)}</strong> <button class="x" style="width:32px;height:32px;font-size:18px" data-glog="${g.id}|${l.id}" aria-label="Видалити внесок">×</button></span></div>`).join("")}</details>` : ""}</div>`;
+  }).join("");
+  el.innerHTML = `<div class="card" style="--i:0"><span class="mute">Вільні накопичення</span><b class="big" data-count="${Math.max(0, P.free)}" data-k="pool">${fmt(Math.max(0, P.free))}</b>
+      <div class="mute">Відкладено за весь час: ${fmt(P.total)} · розподілено по цілях: ${fmt(P.used)}</div>
+      <div class="mute" style="margin-top:10px">Які категорії йдуть у накопичення:</div>
+      <div class="chips">${CATS.map(c => `<button class="chip${gcats.includes(c.k) ? "" : " off"}" data-gcat="${c.k}"><i style="background:${c.color}"></i>${c.name}</button>`).join("")}</div></div>
+    <div class="card" style="--i:1"><details class="det"><summary style="font-weight:700;color:var(--ink);font-size:16px">＋ Нова ціль</summary>
+      <div style="display:grid;gap:8px;margin-top:8px"><input id="gn" type="text" placeholder="Назва (наприклад, Відпустка)" aria-label="Назва цілі"><input id="gt" type="number" inputmode="decimal" min="0" placeholder="Сума цілі, ₴" aria-label="Сума цілі">
+      <label class="mute" for="gd">Бажаний термін (необовʼязково)</label><input id="gd" type="month"><button class="pri" data-gnew>Створити ціль</button></div></details></div>
+    ${cards || `<div class="card mute" style="--i:2">Цілей ще немає. Створіть першу, наприклад «Подушка безпеки».</div>`}`;
+  counts(el);
+}
+function renderCred() {
+  const el = $("t-cred"); if (!el) return;
+  const now = ym(today()), dnow = +today().slice(8);
+  const paid = c => (c.pay || []).reduce((x, p) => x + p.a, 0), bal = c => Math.max(0, c.total - paid(c));
+  const pm = c => (c.pay || []).filter(p => ym(p.d) === now).reduce((x, p) => x + p.a, 0);
+  const act = credits.filter(c => bal(c) > 0);
+  const allow = sums(entries.filter(e => ym(e.date) === now)).t.credit;
+  const need = act.reduce((x, c) => x + Math.min(c.monthly, bal(c) + pm(c)), 0), done = act.reduce((x, c) => x + Math.min(pm(c), c.monthly), 0);
+  const debt = credits.reduce((x, c) => x + bal(c), 0), diff = allow - need;
+  const dim = new Date(+now.slice(0,4), +now.slice(5), 0).getDate();
+  const cards = credits.map((c, i) => {
+    const b = bal(c), p = c.total ? (c.total - b) / c.total * 100 : 0, fin = b <= 0, pmm = pm(c), ok = pmm >= Math.min(c.monthly, b + pmm);
+    let info = "";
+    if (fin) info = `<div class="gdone">Погашено ✓</div>`;
+    else {
+      const dd = String(Math.min(c.day || 1, dim)).padStart(2, "0") + "." + now.slice(5);
+      info += ok ? `<div class="gdone">Платіж цього місяця сплачено ✓</div>` : (c.day || 1) < dnow ? `<div class="warn">Платіж не внесено: термін був ${dd}</div>` : `<div>Наступний платіж: <b>${dd}</b> · ${fmt(Math.min(c.monthly, b))}</div>`;
+      const mths = Math.ceil(b / c.monthly);
+      info += `<div class="mute">Закриття боргу: ≈ ${mlabel(shiftM(now, mths - 1 + (ok ? 1 : 0)))} (${mths} міс. по ${fmt(c.monthly)})</div>`;
+    }
+    return `<div class="card" style="--i:${Math.min(i + 2, 8)}">
+      <div class="goal">${ring(p, fin)}<div><div class="top"><strong style="font-size:18px">${esc(c.name)}</strong><button class="x" data-cdel="${c.id}" aria-label="Видалити кредит">×</button></div>
+        <div>Залишок: <b>${fmt(b)}</b></div><div class="mute">Платіж ${fmt(c.monthly)} · щомісяця ${c.day || 1}-го</div></div></div>
+      <div style="margin-top:10px;display:grid;gap:4px;font-size:14px">${info}</div>
+      ${fin ? "" : `<div class="two" style="grid-template-columns:1fr auto;margin-top:12px"><input id="cp_${c.id}" type="number" inputmode="decimal" min="0" placeholder="${fmt(Math.min(c.monthly, b))}" aria-label="Сума платежу"><button class="pri" style="width:auto;padding:12px 18px" data-cpay="${c.id}">Сплатити</button></div>`}
+      ${(c.pay || []).length ? `<details class="det"><summary>Історія платежів (${c.pay.length})</summary>${c.pay.slice().reverse().map(l => `<div class="row"><span>${l.d.split("-").reverse().join(".")}</span><span><strong>${fmt(l.a)}</strong> <button class="x" style="width:32px;height:32px;font-size:18px" data-clog="${c.id}|${l.id}" aria-label="Видалити платіж">×</button></span></div>`).join("")}</details>` : ""}</div>`;
+  }).join("");
+  el.innerHTML = `<div class="card" style="--i:0"><span class="mute">Загальний борг</span><b class="big" data-count="${debt}" data-k="debt">${fmt(debt)}</b>
+      ${act.length ? `<div class="stats"><div><span class="mute">Допуск на кредити (${MN[+now.slice(5)-1]})</span><b>${fmt(allow)}</b></div><div><span class="mute">Платежі за місяць</span><b>${fmt(need)}</b></div></div>
+      <div class="meter"><i style="width:${need ? Math.min(100, done / need * 100) : 0}%;background:var(--c4)"></i></div><div class="mute">Сплачено цього місяця: ${fmt(done)} з ${fmt(need)}</div>
+      <div style="margin-top:8px;font-size:14px" class="${diff < 0 ? "warn" : "gdone"}">${diff >= 0 ? "Допуску вистачає, запас " + fmt(diff) : "Не вистачає " + fmt(-diff) + ": платежі більші за допуск (він рахується з надходжень цього місяця)"}</div>` : ""}</div>
+    <div class="card" style="--i:1"><details class="det"><summary style="font-weight:700;color:var(--ink);font-size:16px">＋ Новий кредит</summary>
+      <div style="display:grid;gap:8px;margin-top:8px"><input id="cn" type="text" placeholder="Назва (наприклад, Кредит на авто)" aria-label="Назва кредиту"><input id="ct" type="number" inputmode="decimal" min="0" placeholder="Поточний залишок боргу, ₴" aria-label="Залишок боргу"><input id="cm" type="number" inputmode="decimal" min="0" placeholder="Щомісячний платіж, ₴" aria-label="Щомісячний платіж"><input id="cd" type="number" inputmode="numeric" min="1" max="31" placeholder="День платежу (1–31)" aria-label="День платежу"><button class="pri" data-cnew>Додати кредит</button></div></details></div>
+    ${cards || `<div class="card mute" style="--i:2">Кредитів немає. Додайте перший, щоб бачити залишок, графік платежів і порівняння з допуском.</div>`}`;
+  counts(el);
+}
+function delEntry(id) {
+  const en = entries.find(x => x.id === id); if (!en) return;
+  const ref = doc(db,"users",user.uid,"incomes",id);
+  setDoc(ref, { ...entryData(en), deleted: Date.now() }).catch(() => {});
+  undoToast("Видалено " + fmt(en.amount) + " · лежить у кошику", () => setDoc(ref, entryData(en)).catch(() => {}));
+}
+let armed = null, armT = null;
+function arm(k) { armed = k; renderTrash(); clearTimeout(armT); armT = setTimeout(() => { armed = null; renderTrash(); }, 4000); }
+function renderTrash() {
+  const el = $("trash"); if (!el) return;
+  $("trashh").textContent = "Кошик" + (trash.length ? " (" + trash.length + ")" : "");
+  if (!trash.length) { el.innerHTML = `<p class="mute">Кошик порожній. Видалені записи потрапляють сюди й лежать, поки ви самі не видалите їх назавжди.</p>`; return; }
+  el.innerHTML = `<p class="mute">Видалені записи не враховуються в підсумках, але їх можна повернути.</p>` + trash.map(e => `<div class="row"><span><b>${fmt(e.amount)}</b> <em>${e.date.split("-").reverse().join(".")}${e.note ? " · " + esc(e.note) : ""}</em><br><span class="mute">видалено ${new Date(e.deleted).toLocaleDateString("uk-UA")}</span></span><span style="display:flex;gap:6px"><button class="chip tpl" data-trs="${e.id}">Повернути</button><button class="chip st no" style="margin-top:0" data-trx="${e.id}" aria-label="Видалити назавжди">${armed === "x" + e.id ? "Точно?" : "×"}</button></span></div>`).join("") +
+    `<button class="ghost" data-trall style="width:100%;margin-top:12px">${armed === "all" ? "Натисніть ще раз, щоб очистити все" : "Очистити кошик назавжди"}</button>`;
+}
+(function () {
+  const list = $("list"); let st = null, swiped = 0;
+  list.addEventListener("pointerdown", e => {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    const sl = e.target.closest(".swipe-slide"); if (!sl) return;
+    st = { sl, bg: sl.nextElementSibling, x: e.clientX, y: e.clientY, id: e.pointerId, drag: false, dx: 0 };
+    sl.classList.remove("snap");
+  });
+  list.addEventListener("pointermove", e => {
+    if (!st || e.pointerId !== st.id) return;
+    const dx = e.clientX - st.x, dy = e.clientY - st.y;
+    if (!st.drag) {
+      if (Math.abs(dy) > 12 && Math.abs(dy) > Math.abs(dx)) { st = null; return; }
+      if (dx < -10 && Math.abs(dx) > Math.abs(dy)) { st.drag = true; try { st.sl.setPointerCapture(e.pointerId); } catch (_) {} } else return;
+    }
+    st.dx = Math.min(0, dx);
+    st.sl.style.transform = "translateX(" + st.dx + "px)";
+    st.bg.style.width = -st.dx + "px";
+  });
+  const end = e => {
+    if (!st || e.pointerId !== st.id) return;
+    const s2 = st; st = null;
+    if (!s2.drag) return;
+    swiped = Date.now();
+    s2.sl.classList.add("snap");
+    const id = s2.sl.parentElement.dataset.sid;
+    if (e.type === "pointerup" && s2.dx < -Math.max(70, Math.min(120, s2.sl.offsetWidth * 0.35))) {
+      s2.sl.style.transform = "translateX(-105%)"; s2.bg.style.width = s2.sl.offsetWidth + "px";
+      setTimeout(() => delEntry(id), 230);
+    } else { s2.sl.style.transform = ""; s2.bg.style.width = "0px"; }
+  };
+  list.addEventListener("pointerup", end); list.addEventListener("pointercancel", end);
+  list.addEventListener("click", e => { if (Date.now() - swiped < 400) { e.stopPropagation(); e.preventDefault(); } }, true);
+})();
+let editId = null;
+function cp() { const e = editId && entries.find(x => x.id === editId); return (e && e.pct) || pct; }
+function exitEdit() {
+  editId = null; $("amt").value = ""; $("svd").value = ""; $("note").value = ""; $("dt").value = today();
+  $("add").textContent = "Додати надходження"; $("editbar").classList.add("hide");
+  document.querySelector(".det").open = false; live();
+}
+function esplit(e) {
+  const p = e.pct || pct, base = split(e.amount, p);
+  if (e.saved === undefined || e.saved === null) return base;
+  const sv = Math.min(Math.max(0, +e.saved || 0), e.amount), rest = e.amount - sv;
+  const others = CATS.filter(c => c.k !== "save"), w = others.reduce((x, c) => x + (p[c.k] || 0), 0), out = { save: sv };
+  others.forEach(c => out[c.k] = w > 0 ? rest * (p[c.k] || 0) / w : rest / others.length);
+  return out;
+}
+const planS = e => e.amount * ((e.pct || pct).save || 0) / 100;
+function readSaved(a, p) {
+  const v = $("svd").value; if (v === "") return undefined;
+  const sv = Math.min(Math.max(0, Number(v) || 0), a), pl = a * (p.save || 0) / 100;
+  return Math.abs(sv - pl) < 0.5 ? undefined : sv;
+}
+const entryData = en => ({ amount: en.amount, date: en.date, note: en.note || "", pct: en.pct || pct, ts: en.ts || Date.now(), ...(en.saved !== undefined && en.saved !== null ? { saved: en.saved } : {}) });
+function stChip(e) {
+  const pl = planS(e); if (pl < 0.5) return "";
+  const sv = e.saved ?? pl, full = sv >= pl - 0.5, none = sv <= 0.5;
+  return `<button class="chip st${full ? "" : none ? " no" : " part"}" data-svt="${e.id}">${full ? "✓ Відкладено " + fmt(pl) : none ? "✗ Не відкладено (" + fmt(pl) + ")" : "◐ Відкладено " + fmt(sv) + " з " + fmt(pl)}</button>`;
+}
+function live() {
+  const a = Number($("amt").value) || 0, p = cp();
+  $("svrow").classList.toggle("hide", !(a > 0));
+  if (!(a > 0)) { $("live").innerHTML = `<p class="mute">Введіть суму: одразу побачите, скільки й куди відкласти</p>`; return; }
+  const pl = a * (p.save || 0) / 100, v = $("svd").value, val = Math.min(Math.max(0, Number(v) || 0), a), ov = v !== "" && Math.abs(val - pl) >= 0.5;
+  $("svd").placeholder = "Усе: " + fmt(pl);
+  const sp = esplit({ amount: a, pct: p, saved: ov ? val : undefined });
+  $("live").innerHTML = `<div class="mute">З ${fmt(a)} розподіліть:</div>` + rows(sp, ov ? null : p, true) +
+    (ov ? `<div class="mute" style="margin-top:6px">Відкладено ${fmt(sp.save)} з ${fmt(pl)}: ${sp.save < pl ? "різницю " + fmt(pl - sp.save) + " розподілено між іншими категоріями" : "додатково " + fmt(sp.save - pl) + " взято з інших категорій"}</div>` : "");
+}
+$("amt").oninput = live; $("svd").oninput = live;
+$("amt").onkeydown = e => { if (e.key === "Enter") $("add").click(); };
+function renderQuick() {
+  const tc = tpls.map(t => `<button class="chip tpl" data-tpl="${t.id}">★ ${esc(t.name)} · ${fmt(t.amount)}</button>`).join("");
+  const rec = [...new Set(entries.map(e => e.amount))].filter(a => !tpls.some(t => t.amount === a)).slice(0, 3);
+  $("qc").innerHTML = tc + rec.map(a => `<button class="chip" data-set="${a}">${fmt(a)}</button>`).join("") + [500,1000,5000].map(a => `<button class="chip" data-q="${a}">+${a.toLocaleString("uk-UA")}</button>`).join("") + `<button class="chip" data-tsave>＋ Зберегти як шаблон</button>`;
+  $("tpls").innerHTML = tpls.length ? tpls.map(t => `<div class="row"><span>${esc(t.name)}<em>${fmt(t.amount)}</em></span><button class="x" data-tdel="${t.id}" aria-label="Видалити шаблон">×</button></div>`).join("") : `<p class="mute">Шаблонів ще немає. На головній введіть суму та коментар і натисніть «Зберегти як шаблон».</p>`;
+}
+
+$("add").onclick = () => {
+  const a = Number($("amt").value);
+  if (!(a > 0)) return toast("Введіть суму більше нуля");
+  if (editId) {
+    const old = entries.find(x => x.id === editId), nd = $("dt").value || today(), sv = readSaved(a, old ? (old.pct || pct) : pct);
+    if (!old) { exitEdit(); return toast("Запис уже видалено"); }
+    setDoc(doc(db,"users",user.uid,"incomes",editId), { amount: a, date: nd, note: $("note").value.trim(), pct: old.pct || pct, ts: old.ts || Date.now(), ...(sv !== undefined ? { saved: sv } : {}) }).catch(e => toast("Помилка: " + (e.code || e.message)));
+    cur = ym(nd); exitEdit(); $("amt").blur(); toast("Зміни збережено ✓"); render(); return;
+  }
+  const date = $("dt").value || today(), p = { ...pct }, sv = readSaved(a, p);
+  addDoc(collection(db,"users",user.uid,"incomes"), { amount:a, date, note:$("note").value.trim(), pct:p, ts:Date.now(), ...(sv !== undefined ? { saved: sv } : {}) }).catch(e => toast("Помилка: " + (e.code || e.message)));
+  cur = ym(date);
+  $("amt").value = ""; $("note").value = ""; $("svd").value = ""; live();
+  $("amt").blur(); $("dt").value = today(); document.querySelector(".det").open = false;
+  $("last").innerHTML = `<div class="card pop"><div class="top"><div><span class="mute">Розподіл суми</span><span class="big">${fmt(a)}</span></div><button class="x" data-dismiss aria-label="Сховати">×</button></div>${rows(esplit({ amount: a, pct: p, saved: sv }), sv === undefined ? p : null, true)}</div>`;
+  render(); window.scrollTo({ top: 0, behavior: "smooth" });
+};
+
+document.addEventListener("click", e => {
+  const t = e.target.closest("[data-tab],[data-nav],[data-del],[data-q],[data-d],[data-set],[data-dismiss],[data-trs],[data-trx],[data-trall],[data-cbk],[data-cq],[data-svt],[data-sv],[data-edit],[data-cancel],[data-tpl],[data-tsave],[data-tdel],[data-cnew],[data-cpay],[data-clog],[data-cdel],[data-gnew],[data-gadd],[data-gfill],[data-glog],[data-gdel],[data-gcat],[data-rep],[data-repm],[data-am],[data-anav],[data-hc],[data-bk]");
+  if (!t) return;
+  const d = t.dataset;
+  if (d.tab) {
+    document.body.dataset.tab = d.tab;
+    for (const id of ["home","an","goals","cred","set"]) $("t-"+id).classList.toggle("hide", id !== d.tab);
+    document.querySelectorAll("nav button").forEach(b => b.classList.toggle("on", b === t));
+    window.scrollTo(0,0);
+  } else if (d.nav) { cur = shiftM(cur, +d.nav); render(); }
+  else if (d.del !== undefined) delEntry(d.del);
+  else if (d.edit) {
+    const en = entries.find(x => x.id === d.edit); if (!en) return;
+    editId = en.id; $("amt").value = en.amount; $("dt").value = en.date; $("note").value = en.note || ""; $("svd").value = en.saved ?? "";
+    $("add").textContent = "Зберегти зміни"; $("editbar").classList.remove("hide");
+    document.querySelector(".det").open = true; $("last").innerHTML = ""; live();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  else if (d.cancel !== undefined) exitEdit();
+  else if (d.trs) { const en = trash.find(x => x.id === d.trs); if (!en) return; setDoc(doc(db,"users",user.uid,"incomes",en.id), entryData(en)).catch(() => {}); toast("Запис повернено ✓"); }
+  else if (d.trx) { if (armed === "x" + d.trx) { armed = null; deleteDoc(doc(db,"users",user.uid,"incomes",d.trx)).catch(() => {}); toast("Видалено назавжди"); } else arm("x" + d.trx); }
+  else if (d.trall !== undefined) { if (armed === "all") { armed = null; trash.forEach(e => deleteDoc(doc(db,"users",user.uid,"incomes",e.id)).catch(() => {})); toast("Кошик очищено"); } else arm("all"); }
+  else if (d.cbk) { an.cmpB = d.cbk; renderAn(); }
+  else if (d.cq) {
+    const B = an.cmpB || ym(today()), A = an.cmpA || shiftM(B, -1);
+    if (d.cq === "prev") an.cmpA = shiftM(B, -1); else if (d.cq === "year") an.cmpA = shiftM(B, -12); else { an.cmpA = B; an.cmpB = A; }
+    renderAn();
+  }
+  else if (d.sv) { $("svd").value = d.sv === "zero" ? "0" : ""; live(); }
+  else if (d.svt) {
+    const en = entries.find(x => x.id === d.svt); if (!en) return;
+    const full = (en.saved ?? planS(en)) >= planS(en) - 0.5, data = entryData(en), old = entryData(en), ref = doc(db,"users",user.uid,"incomes",en.id);
+    if (full) data.saved = 0; else delete data.saved;
+    setDoc(ref, data).catch(() => {});
+    undoToast(full ? "Позначено: не відкладено, суму розподілено по інших категоріях" : "Позначено: відкладено повністю", () => setDoc(ref, old).catch(() => {}));
+  }
+  else if (d.q !== undefined) { $("amt").value = (Number($("amt").value) || 0) + Number(d.q); live(); }
+  else if (d.d !== undefined) { const x = new Date(); x.setDate(x.getDate() - d.d); $("dt").value = isoD(x); }
+  else if (d.set !== undefined) { $("amt").value = d.set; live(); }
+  else if (d.dismiss !== undefined) $("last").innerHTML = "";
+  else if (d.rep !== undefined) openReport(...an.rng);
+  else if (d.repm !== undefined) { const r = rangeOf("month", cur + "-01"); openReport(r[0], r[1], mlabel(cur)); }
+  else if (d.am) {
+    if (d.am === "custom" && an.mode !== "custom") [an.from, an.to] = rangeOf(an.mode === "all" || an.mode === "cmp" ? "month" : an.mode, an.ref);
+    an.mode = d.am; an.sel = null; renderAn();
+  }
+  else if (d.anav) {
+    const k = +d.anav, r = pd(an.ref);
+    an.ref = an.mode === "week" ? addDays(an.ref, 7 * k) : an.mode === "month" ? isoD(new Date(r.getFullYear(), r.getMonth() + k, 1, 12)) : isoD(new Date(r.getFullYear() + k, 0, 1, 12));
+    an.sel = null; renderAn();
+  }
+  else if (d.hc) { an.hide.has(d.hc) ? an.hide.delete(d.hc) : an.hide.add(d.hc); renderAn(); }
+  else if (d.bk) { an.sel = an.sel === d.bk ? null : d.bk; renderAn(); }
+  else if (d.tpl) { const t = tpls.find(x => x.id === d.tpl); if (t) { $("amt").value = t.amount; $("note").value = t.note || ""; if (t.note) document.querySelector(".det").open = true; live(); $("add").scrollIntoView({ block: "center", behavior: "smooth" }); } }
+  else if (d.tsave !== undefined) {
+    const a = Number($("amt").value), note = $("note").value.trim(), name = note || "Дохід";
+    if (!(a > 0)) return toast("Спочатку введіть суму");
+    if (tpls.some(t => t.name === name && t.amount === a)) return toast("Такий шаблон уже є");
+    addDoc(collection(db,"users",user.uid,"templates"), { name, amount: a, note, ts: Date.now() }).catch(() => {});
+    toast("Шаблон «" + name + "» збережено");
+  }
+  else if (d.tdel) {
+    const t = tpls.find(x => x.id === d.tdel); if (!t) return;
+    deleteDoc(doc(db,"users",user.uid,"templates",t.id)).catch(() => {});
+    undoToast("Шаблон видалено", () => setDoc(doc(db,"users",user.uid,"templates",t.id), { name: t.name, amount: t.amount, note: t.note || "", ts: t.ts }).catch(() => {}));
+  }
+  else if (d.cnew !== undefined) {
+    const name = $("cn").value.trim(), total = Number($("ct").value), monthly = Number($("cm").value), day = Math.min(31, Math.max(1, Math.round(Number($("cd").value) || 1)));
+    if (!name || !(total > 0) || !(monthly > 0)) return toast("Вкажіть назву, залишок і щомісячний платіж");
+    addDoc(collection(db,"users",user.uid,"credits"), { name, total, monthly, day, pay: [], ts: Date.now() }).catch(() => {});
+    toast("Кредит додано");
+  }
+  else if (d.cpay) {
+    const c = credits.find(x => x.id === d.cpay); if (!c) return;
+    const b = Math.max(0, c.total - (c.pay || []).reduce((x, p) => x + p.a, 0));
+    const a = Math.min(Number($("cp_" + c.id).value) || Math.min(c.monthly, b), b);
+    if (!(a > 0)) return toast("Борг уже погашено");
+    const { id, ...data } = c; data.pay = [...(c.pay || []), { id: Date.now().toString(36), a, d: today() }];
+    setDoc(doc(db,"users",user.uid,"credits",c.id), data).catch(() => {}); toast("Платіж " + fmt(a) + " записано");
+  }
+  else if (d.clog) {
+    const [cid, lid] = d.clog.split("|"), c = credits.find(x => x.id === cid); if (!c) return;
+    const { id, ...data } = c; data.pay = c.pay.filter(l => l.id !== lid);
+    setDoc(doc(db,"users",user.uid,"credits",cid), data).catch(() => {});
+  }
+  else if (d.cdel) {
+    const c = credits.find(x => x.id === d.cdel); if (!c) return;
+    const { id, ...data } = c;
+    deleteDoc(doc(db,"users",user.uid,"credits",id)).catch(() => {});
+    undoToast("Кредит «" + c.name + "» видалено", () => setDoc(doc(db,"users",user.uid,"credits",id), data).catch(() => {}));
+  }
+  else if (d.gnew !== undefined) {
+    const name = $("gn").value.trim(), target = Number($("gt").value);
+    if (!name || !(target > 0)) return toast("Вкажіть назву та суму цілі");
+    addDoc(collection(db,"users",user.uid,"goals"), { name, target, deadline: $("gd").value || "", log: [], ts: Date.now() }).catch(() => {});
+    toast("Ціль створено");
+  }
+  else if (d.gadd) {
+    const g = goals.find(x => x.id === d.gadd), a = Number($("gi_" + d.gadd).value), free = poolInfo().free;
+    if (!g || !(a > 0)) return toast("Введіть суму внеску");
+    if (a > free + 0.5) return toast("Вільно лише " + fmt(Math.max(0, free)));
+    const { id, ...data } = g; data.log = [...(g.log || []), { id: Date.now().toString(36), a, d: today() }];
+    setDoc(doc(db,"users",user.uid,"goals",g.id), data).catch(() => {}); toast("Додано " + fmt(a));
+  }
+  else if (d.gfill) { const [gid, v] = d.gfill.split("|"); $("gi_" + gid).value = v; }
+  else if (d.glog) {
+    const [gid, lid] = d.glog.split("|"), g = goals.find(x => x.id === gid); if (!g) return;
+    const { id, ...data } = g; data.log = g.log.filter(l => l.id !== lid);
+    setDoc(doc(db,"users",user.uid,"goals",gid), data).catch(() => {});
+  }
+  else if (d.gdel) {
+    const g = goals.find(x => x.id === d.gdel); if (!g) return;
+    const { id, ...data } = g;
+    deleteDoc(doc(db,"users",user.uid,"goals",id)).catch(() => {});
+    undoToast("Ціль «" + g.name + "» видалено", () => setDoc(doc(db,"users",user.uid,"goals",id), data).catch(() => {}));
+  }
+  else if (d.gcat) {
+    gcats = gcats.includes(d.gcat) ? gcats.filter(k => k !== d.gcat) : [...gcats, d.gcat];
+    if (!gcats.length) gcats = [d.gcat];
+    setDoc(doc(db,"users",user.uid,"settings","main"), { goalCats: gcats }, { merge: true }).catch(() => {}); renderGoals();
+  }
+});
+document.addEventListener("change", e => {
+  if (e.target.id === "cma" || e.target.id === "cmb") { if ($("cma").value) an.cmpA = $("cma").value; if ($("cmb").value) an.cmpB = $("cmb").value; renderAn(); return; }
+  if (e.target.id === "anf" || e.target.id === "ant") { an.from = $("anf").value || an.from; an.to = $("ant").value || an.to; an.sel = null; renderAn(); }
+});
+
+$("savePct").onclick = () => {
+  const p = {}; CATS.forEach(c => p[c.k] = Math.max(0, Number($("p_"+c.k).value) || 0));
+  if (CATS.reduce((a,c) => a + p[c.k], 0) !== 100) return toast("Сума має бути 100%");
+  setDoc(doc(db,"users",user.uid,"settings","main"), { pct: p }, { merge: true }).catch(() => {});
+  toast("Збережено ✓");
+};
+
+// ---------- Відображення ----------
+const lastV = {};
+function counts(root) {
+  root.querySelectorAll("[data-count]").forEach(el => {
+    const to = +el.dataset.count, k = el.dataset.k, from = lastV[k] ?? 0; lastV[k] = to;
+    if (reduce || from === to) return;
+    const t0 = performance.now();
+    (function f(t) { const p = Math.min(1, (t - t0) / 700), e = 1 - Math.pow(1 - p, 3); el.textContent = fmt(from + (to - from) * e); if (p < 1) requestAnimationFrame(f); })(t0);
+  });
+}
+const sums = list => {
+  const t = Object.fromEntries(CATS.map(c => [c.k, 0])); let inc = 0;
+  list.forEach(e => { const s = esplit(e); inc += e.amount; CATS.forEach(c => t[c.k] += s[c.k]); });
+  return { inc, t };
+};
+function donut(t, inc) {
+  let cum = 0;
+  const segs = inc ? CATS.map(c => {
+    const f = t[c.k] / inc * 100;
+    const s = `<circle r="40" cx="60" cy="60" pathLength="100" fill="none" stroke-width="12" style="stroke:${c.color};stroke-dasharray:${Math.max(f - 1.2, 0)} 100;stroke-dashoffset:${-cum};animation:draw 1.1s cubic-bezier(.2,.8,.2,1) both"/>`;
+    cum += f; return s;
+  }).join("") : "";
+  return `<svg viewBox="0 0 120 120" class="donut" aria-hidden="true"><circle r="40" cx="60" cy="60" fill="none" stroke-width="12" style="stroke:var(--line)"/><g transform="rotate(-90 60 60)">${segs}</g></svg>`;
+}
+
+function render() {
+  if (!user) return;
+  if (editId && !entries.some(x => x.id === editId)) exitEdit();
+  const list = entries.filter(e => ym(e.date) === cur), { inc, t } = sums(list);
+  $("hero").innerHTML = `<div class="mnav"><button class="ic" data-nav="-1" aria-label="Попередній місяць">‹</button><h2>${mlabel(cur)}</h2><button class="ic" data-nav="1" aria-label="Наступний місяць">›</button></div>
+    <div class="dw">${donut(t, inc)}<div class="ctr"><span class="mute">Надійшло</span><b class="big" data-count="${inc}" data-k="hero">${fmt(inc)}</b><span class="mute">записів: ${list.length}</span></div></div>
+    ${CATS.map(c => `<div class="row"><span><i style="background:${c.color}"></i>${c.name}<em>${inc ? Math.round(t[c.k] / inc * 100) : pct[c.k]}%</em></span><strong>${fmt(t[c.k])}</strong></div>`).join("")}
+    <button class="ghost" data-repm style="width:100%;margin-top:12px">Звіт за місяць для друку (PDF)</button>`;
+  $("list").innerHTML = list.length ? list.map((e, i) => {
+    const s = esplit(e);
+    return `<div class="swipe" data-sid="${e.id}"><div class="swipe-slide"><div class="card" style="--i:${Math.min(i + 1, 8)}"><div class="top"><div><strong style="font-size:20px">${fmt(e.amount)}</strong><div class="mute">${e.date.split("-").reverse().join(".")}${e.note ? " · " + esc(e.note) : ""}</div></div><div style="display:flex;gap:6px"><button class="x" data-edit="${e.id}" aria-label="Редагувати">✎</button><button class="x" data-del="${e.id}" aria-label="Видалити">×</button></div></div>
+      ${stChip(e)}<div class="chips">${CATS.map(c => `<span class="chip"><i style="background:${c.color}"></i>${fmt(s[c.k])}</span>`).join("")}</div></div></div><div class="swipe-bg"><span style="padding-right:22px">Видалити</span></div></div>`;
+  }).join("") + `<div class="mute" style="text-align:center;margin-top:4px">← Змахніть запис вліво, щоб видалити (він піде в кошик)</div>` : `<div class="card mute" style="--i:1">Цього місяця ще немає надходжень. Додайте першу суму зверху.</div>`;
+  counts($("hero")); renderQuick(); renderAn(); renderGoals(); renderCred(); renderTrash();
+}
+
+function renderPct() {
+  $("pcts").innerHTML = CATS.map(c => `<label for="p_${c.k}">${c.name}</label><input id="p_${c.k}" type="number" inputmode="decimal" min="0" max="100" value="${pct[c.k]}">`).join("");
+  $("pcts").oninput = () => {
+    const s = CATS.reduce((a,c) => a + (Number($("p_"+c.k).value) || 0), 0);
+    $("warn").textContent = s === 100 ? "" : `Сума: ${s}%. Має бути 100%.`;
+    $("pm").style.width = Math.min(s, 100) + "%"; $("pm").style.background = s === 100 ? "var(--acc)" : "var(--c2)";
+  };
+}
+
+const an = { mode: "month", ref: today(), from: "", to: "", hide: new Set(), sel: null };
+const pd = s => new Date(s + "T12:00:00");
+const addDays = (s, n) => { const d = pd(s); d.setDate(d.getDate() + n); return isoD(d); };
+const days = (a, b) => Math.round((pd(b) - pd(a)) / 864e5) + 1;
+const WD = ["Пн","Вт","Ср","Чт","Пт","Сб","Нд"];
+const dshort = s => s.slice(8) + "." + s.slice(5,7);
+function rangeOf(mode, ref) {
+  const d = pd(ref), y = d.getFullYear(), m = d.getMonth();
+  if (mode === "week") { const s = addDays(ref, -((d.getDay() + 6) % 7)); return [s, addDays(s, 6)]; }
+  if (mode === "month") return [isoD(new Date(y, m, 1, 12)), isoD(new Date(y, m + 1, 0, 12))];
+  if (mode === "year") return [y + "-01-01", y + "-12-31"];
+  if (mode === "all") { const ds = entries.map(e => e.date).sort(); return ds.length ? [ds[0], ds[ds.length-1]] : [today(), today()]; }
+  return [an.from || today(), an.to || today()];
+}
+function prevRange(mode, [a, b]) {
+  if (mode === "week") return [addDays(a, -7), addDays(a, -1)];
+  if (mode === "month" || mode === "year") return rangeOf(mode, addDays(a, -1));
+  if (mode === "custom") { const n = days(a, b); return [addDays(a, -n), addDays(a, -1)]; }
+  return null;
+}
+const AN_MODES = [["week","Тиждень"],["month","Місяць"],["year","Рік"],["all","Все"],["custom","Свій"],["cmp","Місяці ⇄"]];
+const segCard = () => `<div class="card" style="--i:0"><div class="seg">${AN_MODES.map(([m, t]) => `<button class="${m === an.mode ? "on" : ""}" data-am="${m}">${t}</button>`).join("")}</div></div>`;
+const monthSums = k => { const l = entries.filter(e => ym(e.date) === k); return { ...sums(l), n: l.length }; };
+const sgn = v => (v < 0 ? "−" : "+") + fmt(Math.abs(v));
+function cmpHtml() {
+  const B = an.cmpB || ym(today()), A = an.cmpA || shiftM(B, -1), sa = monthSums(A), sb = monthSums(B), d = sb.inc - sa.inc, dp = sa.inc ? d / sa.inc * 100 : null, ok = sa.n && sb.n;
+  const mx = Math.max(...CATS.map(c => Math.max(sa.t[c.k], sb.t[c.k])), 1);
+  return `<div class="card" style="--i:1"><h2>Порівняння місяців</h2>
+    <div class="two" style="margin-top:10px"><div><span class="mute">Місяць А (база)</span><input id="cma" type="month" value="${A}" aria-label="Місяць А"></div><div><span class="mute">Місяць Б</span><input id="cmb" type="month" value="${B}" aria-label="Місяць Б"></div></div>
+    <div class="chips"><button class="chip" data-cq="prev">А — місяць перед Б</button><button class="chip" data-cq="year">А — той самий місяць торік</button><button class="chip" data-cq="swap">⇄ Поміняти</button></div></div>
+    <div class="card" style="--i:2"><div class="stats" style="margin-top:0"><div><span class="mute">${mlabel(A)}</span><b>${fmt(sa.inc)}</b><span class="mute">записів: ${sa.n}</span></div><div><span class="mute">${mlabel(B)}</span><b>${fmt(sb.inc)}</b><span class="mute">записів: ${sb.n}</span></div></div>
+      <div style="margin-top:12px;font-size:20px;font-weight:800" class="${d >= 0 ? "gdone" : "warn"}">${ok ? sgn(d) + (dp === null ? "" : " (" + (dp >= 0 ? "+" : "") + Math.round(dp) + "%)") : "—"}</div>
+      <div class="mute">${ok ? "зміна доходу від А до Б" : "В одному з місяців немає надходжень, порівнювати нема з чим"}</div></div>
+    <div class="card" style="--i:3"><h2>По категоріях</h2>${CATS.map(c => `<div style="margin-top:14px"><div class="top"><span><i style="display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px;background:${c.color}"></i>${c.name}</span><strong>${sgn(sb.t[c.k] - sa.t[c.k])}</strong></div>
+      <div class="mute" style="margin-top:6px">${mlabel(A)} · ${fmt(sa.t[c.k])}</div><div class="meter" style="margin-top:3px"><i style="width:${sa.t[c.k] / mx * 100}%;background:${c.color};opacity:.45"></i></div>
+      <div class="mute" style="margin-top:6px">${mlabel(B)} · ${fmt(sb.t[c.k])}</div><div class="meter" style="margin-top:3px"><i style="width:${sb.t[c.k] / mx * 100}%;background:${c.color}"></i></div></div>`).join("")}</div>`;
+}
+function trendHtml() {
+  const end = ym(today()), ms = []; for (let i = 23; i >= 0; i--) ms.push(shiftM(end, -i));
+  const by = ms.map(k => ({ k, ...monthSums(k) })), has = by.filter(x => x.inc > 0), B = an.cmpB || end, A = an.cmpA || shiftM(B, -1);
+  const slot = 28, W = by.length * slot + 20, H = 200, bw = 20, max = Math.max(...by.map(x => x.inc), 1);
+  const svg = by.map((x, i) => {
+    const px = 10 + i * slot + (slot - bw) / 2; let y = H - 30;
+    const r = CATS.map(c => { const h = x.t[c.k] / max * (H - 60); y -= h; return `<rect class="bar" style="--i:${Math.min(i, 12)}" x="${px}" y="${y}" width="${bw}" height="${h}" fill="${c.color}" rx="2"/>`; }).join("");
+    const m = +x.k.slice(5) - 1;
+    return `<g data-cbk="${x.k}" style="cursor:pointer"><rect x="${10 + i * slot}" y="0" width="${slot}" height="${H}" fill="${x.k === A ? "var(--glass2)" : "transparent"}" ${x.k === B ? 'stroke="var(--acc)" stroke-width="1.5"' : ""} rx="6"/>${r}<text x="${px + bw / 2}" y="${H - 16}" text-anchor="middle">${MN[m].slice(0, 3)}</text>${m === 0 || i === 0 ? `<text x="${px + bw / 2}" y="${H - 4}" text-anchor="middle">${x.k.slice(2, 4)}</text>` : ""}</g>`;
+  }).join("");
+  const best = has.length ? has.reduce((a, b) => b.inc > a.inc ? b : a) : null, worst = has.length ? has.reduce((a, b) => b.inc < a.inc ? b : a) : null;
+  return `<div class="card" style="--i:4"><h2>Останні 24 місяці</h2><div class="mute">Дані зберігаються без обмеження за часом. Торкніться місяця, щоб поставити його як «Б»: бліда підсвітка — А, рамка — Б.</div>
+    <div class="scroll" id="trend"><svg viewBox="0 0 ${W} ${H}" style="width:${W}px;display:block" role="img" aria-label="Доходи за останні 24 місяці">${svg}</svg></div>
+    <div class="chips">${CATS.map(c => `<span class="chip"><i style="background:${c.color}"></i>${c.name}</span>`).join("")}</div>
+    ${has.length ? `<div class="stats"><div><span class="mute">Середнє за місяць</span><b>${fmt(has.reduce((x, y) => x + y.inc, 0) / has.length)}</b></div><div><span class="mute">Місяців із доходом</span><b>${has.length} з 24</b></div><div><span class="mute">Найбільший</span><b>${MN[+best.k.slice(5) - 1]} ${best.k.slice(0, 4)}</b></div><div><span class="mute">Найменший</span><b>${MN[+worst.k.slice(5) - 1]} ${worst.k.slice(0, 4)}</b></div></div>` : ""}</div>`;
+}
+function renderCmp(el) {
+  const old = el.querySelector("#trend"), sl = old ? old.scrollLeft : null;
+  el.innerHTML = segCard() + cmpHtml() + trendHtml();
+  const t = $("trend"); if (t) t.scrollLeft = sl === null ? t.scrollWidth : sl;
+}
+function renderAn() {
+  const el = $("t-an");
+  if (!entries.length) { el.innerHTML = `<div class="card mute">Аналітика зʼявиться після першого надходження.</div>`; return; }
+  if (an.mode === "cmp") { renderCmp(el); return; }
+  const mode = an.mode; let [a, b] = rangeOf(mode, an.ref); if (a > b) [a, b] = [b, a];
+  const n = days(a, b), inR = entries.filter(e => e.date >= a && e.date <= b), tot = sums(inR);
+  const unit = (mode === "year" || mode === "all" || (mode === "custom" && n > 62)) ? "month" : "day";
+  const keys = [];
+  if (unit === "day") for (let i = 0; i < n && i < 400; i++) keys.push(addDays(a, i));
+  else for (let k = a.slice(0,7); k <= b.slice(0,7); k = shiftM(k, 1)) keys.push(k);
+  const grp = {}; inR.forEach(e => (grp[unit === "day" ? e.date : ym(e.date)] ||= []).push(e));
+  const by = keys.map(k => ({ k, ...sums(grp[k] || []) }));
+  const blabel = k => unit === "day" ? WD[(pd(k).getDay() + 6) % 7] + ", " + dshort(k) : mlabel(k);
+  const xlabel = k => unit === "day" ? (mode === "week" ? WD[(pd(k).getDay() + 6) % 7] : String(+k.slice(8))) : MN[+k.slice(5)-1].slice(0,3);
+  const pr = prevRange(mode, [a, b]); let diff = null;
+  if (pr) { const pi = sums(entries.filter(e => e.date >= pr[0] && e.date <= pr[1])).inc; if (pi) diff = (tot.inc - pi) / pi * 100; }
+  const best = by.reduce((x, y) => y.inc > x.inc ? y : x, by[0]);
+  const rl = mode === "month" ? mlabel(a.slice(0,7)) : mode === "year" ? a.slice(0,4) : mode === "all" ? "Весь час" : dshort(a) + " – " + dshort(b);
+  const MODES = AN_MODES;
+  const ctl = `<div class="card" style="--i:0"><div class="seg">${MODES.map(([m, t]) => `<button class="${m === mode ? "on" : ""}" data-am="${m}">${t}</button>`).join("")}</div>` +
+    (mode === "custom" ? `<div class="two" style="margin-top:10px"><input id="anf" type="date" value="${a}" aria-label="Від"><input id="ant" type="date" value="${b}" aria-label="До"></div>`
+     : mode === "all" ? `<h2 style="text-align:center;margin-top:12px">${rl}</h2>`
+     : `<div class="mnav" style="margin-top:10px"><button class="ic" data-anav="-1" aria-label="Назад">‹</button><h2>${rl}</h2><button class="ic" data-anav="1" aria-label="Вперед">›</button></div>`) + `<button class="ghost" data-rep style="width:100%;margin-top:12px">Звіт для друку (PDF)</button></div>`;
+  an.rng = [a, b, mode === "week" || mode === "custom" ? a.split("-").reverse().join(".") + " – " + b.split("-").reverse().join(".") : rl];
+  if (!inR.length) { el.innerHTML = ctl + `<div class="card mute" style="--i:1">У цьому періоді немає надходжень.</div>`; return; }
+
+  const vis = CATS.filter(c => !an.hide.has(c.k)), vt = t => vis.reduce((s, c) => s + t[c.k], 0);
+  const slot = n <= 7 && unit === "day" ? 44 : keys.length <= 14 ? 28 : keys.length <= 31 ? 18 : 24;
+  const W = Math.max(340, keys.length * slot + 20), H = 190, bw = slot - (slot > 20 ? 8 : 4), max = Math.max(...by.map(x => vt(x.t)), 1);
+  const step = keys.length <= 14 ? 1 : Math.ceil(keys.length / 10);
+  const svg = by.map((x, i) => {
+    const px = 10 + i * slot + (slot - bw) / 2; let y = H - 22;
+    const r = vis.map(c => { const h = (x.t[c.k] / max) * (H - 54); y -= h; return `<rect class="bar" style="--i:${Math.min(i, 12)}" x="${px}" y="${y}" width="${bw}" height="${h}" fill="${c.color}" rx="3"/>`; }).join("");
+    const v = vt(x.t);
+    return `<g data-bk="${x.k}" style="cursor:pointer"><rect x="${10 + i * slot}" y="0" width="${slot}" height="${H}" fill="${x.k === an.sel ? "var(--glass2)" : "transparent"}" rx="6"/>${r}` +
+      (keys.length <= 14 && v > 0 ? `<text x="${px + bw/2}" y="${y - 5}" text-anchor="middle">${v >= 1000 ? Math.round(v / 1000) + "k" : Math.round(v)}</text>` : "") +
+      (i % step === 0 ? `<text x="${px + bw/2}" y="${H - 7}" text-anchor="middle">${xlabel(x.k)}</text>` : "") + `</g>`;
+  }).join("");
+  const sel = an.sel && by.find(x => x.k === an.sel);
+
+  el.innerHTML = ctl + `
+    <div class="card" style="--i:1"><span class="mute">Надійшло за період</span><b class="big" data-count="${tot.inc}" data-k="an">${fmt(tot.inc)}</b>
+      <div class="stats">
+        <div><span class="mute">Відкладено</span><b>${fmt(tot.t.save)}</b></div>
+        <div><span class="mute">Інвестування</span><b>${fmt(tot.t.invest)}</b></div>
+        <div><span class="mute">Середнє за день</span><b>${fmt(tot.inc / n)}</b></div>
+        <div><span class="mute">Середнє надходження</span><b>${fmt(tot.inc / inR.length)}</b></div>
+        <div><span class="mute">Найкращий ${unit === "day" ? "день" : "місяць"}</span><b>${blabel(best.k)}</b></div>
+        <div><span class="mute">До попереднього періоду</span><b>${diff === null ? "—" : (diff >= 0 ? "+" : "") + Math.round(diff) + "%"}</b></div>
+      </div></div>
+    <div class="card" style="--i:2"><div class="top"><h2>${unit === "day" ? "Доходи по днях" : "Доходи по місяцях"}</h2><span class="mute">записів: ${inR.length}</span></div>
+      <div class="scroll"><svg viewBox="0 0 ${W} ${H}" style="width:${W <= 340 ? "100%" : W + "px"};display:block" role="img" aria-label="Діаграма доходів">${svg}</svg></div>
+      <div class="mute" style="margin-top:6px">Торкніться стовпчика, щоб побачити розподіл. Категорії можна вимикати:</div>
+      <div class="chips">${CATS.map(c => `<button class="chip${an.hide.has(c.k) ? " off" : ""}" data-hc="${c.k}"><i style="background:${c.color}"></i>${c.name}</button>`).join("")}</div></div>
+    ${sel ? `<div class="card pop"><div class="top"><div><span class="mute">${blabel(sel.k)}</span><span class="big">${fmt(sel.inc)}</span></div></div>${rows(sel.t, null, true)}</div>` : ""}
+    <div class="card" style="--i:3"><h2>Розподіл за період</h2>
+      ${CATS.map(c => { const sh = tot.inc ? tot.t[c.k] / tot.inc * 100 : 0; return `<div style="margin-top:12px"><div class="top"><span>${c.name}</span><strong>${fmt(tot.t[c.k])}</strong></div><div class="meter"><i style="width:${sh}%;background:${c.color}"></i></div></div>`; }).join("")}</div>
+    <div class="card" style="--i:4"><h2>${unit === "day" ? "По днях" : "По місяцях"}</h2>
+      ${by.filter(x => x.inc > 0).reverse().slice(0, 60).map(x => `<div class="row"><span>${blabel(x.k)}</span><strong>${fmt(x.inc)}</strong></div>`).join("")}</div>`;
+  counts(el);
+}
+
+renderPct(); live(); renderQuick(); renderGoals(); renderCred(); renderTrash();
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+</script>
+</body>
+</html>
